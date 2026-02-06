@@ -1,6 +1,6 @@
 # bladdards-MIMIC-health
 
-## Title: Bladdards (Bladdard Bards) 
+## Title: Bladdards (Bladder Bards) 
 ### Group Members  
 - Aaditya Deshmukh <aaditya.deshmukh@sjsu.edu>
 - Aradhana Anandkumar <aradhana.anandkumar@sjsu.edu>
