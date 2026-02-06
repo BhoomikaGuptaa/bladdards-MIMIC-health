@@ -5,6 +5,7 @@
 - Aaditya Deshmukh <aaditya.deshmukh@sjsu.edu>
 - Aradhana Anandkumar <aradhana.anandkumar@sjsu.edu>
 - Kristy Chan <kristychiching.chan@sjsu.edu>
+- Sharon Mathys <sharon.mathys@sjsu.edu> 
 - Bhoomika Gupta <bhoomika.gupta@sjsu.edu>
 
 ## Dataset Description:
