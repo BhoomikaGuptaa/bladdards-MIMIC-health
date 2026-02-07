@@ -8,6 +8,10 @@
 - Sharon Mathys <sharon.mathys@sjsu.edu> 
 - Bhoomika Gupta <bhoomika.gupta@sjsu.edu>
 
+## Project Purpose
+Examining instances of Bladder Cancer when present or detected in the ED to see if there are predictable sets of symptoms as current Bladder cancer diagnosis rates are low as many of the initial symptoms overlap with other problems in the gastro-intestinal area such as appendicitis.
+
+
 ## Dataset Description:
 Dataset used is called MIMIC-IV. Standing for Medical Information Mart for Intensive Care (MIMIC)-IV is a deidentified dataset of patients admitted to the Emergency Department (ED)or Intensive Care Unit (ICU) at Beth Israel Deaconess Medical Center in Boston MA. It contains data for over 65,000 patients admitted to the ICU and over 200,000 patients admitted to the ED between 2008 - 2022. 
 
