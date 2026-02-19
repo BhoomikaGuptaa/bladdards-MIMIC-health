@@ -14,7 +14,37 @@ This dataset requires training and credentialing for access.
 3. Apply for Credentialing and Upload CITI training reports
 4. Once approved, access to database is granted under Files. Only Credentialed users are allowed to access.
 
-## Data Dictionary
+## Dataset Information
+
+Dataset is installed initially as a .zip file. Once taken out, there are two modules provided: hosp and icu (and optionally ed).
+
+Each module contains csv tables (comma delimited) with headers that are compressed with gz compression. Size of the complete unzipped database with compressed files is ~ 10 GB. 
+
+hosp module contains the data for all the patients seen in the hospital during the time period for this dataset. Patient information and Subject_id is used to link throughout and also with the icu and ed modules. Module size (with compressed tables) is ~ 6.3 GB
+
+icu module contains the data for icu visits for patients through this timeperiod at this hospital. Links to the hosp module (Currently not used). Module size (with compressed tables) is ~ 4.36 GB. 
+
+ed module (if used) contains the data for all the patients seen in the er. Links to the hosp module. Module size (with compressed tables) is 122 MB
+
+
+Note on encoding: All date and date/time stamps are encoded to help de-identify the dataset. Each year is related to the subject according to the 
+
+### Tables used in hosp
+
+admissions
+- Size 19M with 70699 lines
+
+d_icd_diagnoses
+- Size 856K with 3319 lines
+
+diagnoses_icd
+- Size 32M with 118929
+
+
+
+
+
+## More Information
 
 Comprehensive information on the modules and tables used in the database are available at: https://mimic.mit.edu/docs/iv/
 
