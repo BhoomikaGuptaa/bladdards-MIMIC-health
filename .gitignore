@@ -1,3 +1,4 @@
 # data & artifacts
 /data/MIMIC-IV/*
 *.csv.gz
+.DS_store
