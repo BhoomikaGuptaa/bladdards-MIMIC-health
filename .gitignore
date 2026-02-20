@@ -1,0 +1,3 @@
+# data & artifacts
+/data/MIMIC-IV/*
+*.csv.gz
