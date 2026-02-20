@@ -1,0 +1,4 @@
+#data & artifacts
+/data/*
+*.log
+*.csv.gz
