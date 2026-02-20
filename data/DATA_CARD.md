@@ -27,20 +27,25 @@ icu module contains the data for icu visits for patients through this timeperiod
 ed module (if used) contains the data for all the patients seen in the er. Links to the hosp module. Module size (with compressed tables) is 122 MB
 
 
-Note on encoding: All date and date/time stamps are encoded to help de-identify the dataset. Each year is related to the subject according to the 
+Note on encoding: All date and date/time stamps are encoded to help de-identify the dataset. Each year is related to the subject according to the anchor_age, anchor_year and anchor_age_group. Any date related information can be pinpointed to a range of three years according to the realtionship of the date to the anchor_year per each subject_id. (Two subjects with same date can be in different years because of this).
 
 ### Tables used in hosp
+All tables contain headers, comma delimited, and compressed with .gz
 
 admissions
-- Size 19M with 70699 lines
+- Size 19M with 546029 lines
+
+patients
+- Size is 2.7M with 364628 lines
 
 d_icd_diagnoses
-- Size 856K with 3319 lines
+- Size is 856K with 3319 lines
 
 diagnoses_icd
-- Size 32M with 118929
+- Size is 32M with 118929 lines
 
-
+services
+- Size is 8.2M with 593072 lines
 
 
 
