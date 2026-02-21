@@ -3,3 +3,5 @@
 *.csv.gz
 .DS_store
 *.log
+/data/
+/out/
