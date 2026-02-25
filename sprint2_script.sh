@@ -74,6 +74,9 @@ echo "Error in pulling all admissions of patients with their information" >> spr
 
 (echo 'subject_id,hadm_id,admittime,dischtime,deathtime,admission_type,admit_provider_id,admission_location,discharge_location,insurance,language,marital_status,race,edregtime,edoutttime,hospital_expire_flag,gender,anchor_age,anchor_year,anchor_year_group,dod' && join -1 1 -2 1 -t',' <(zcat ${HOSP_PATH}/admissions.csv.gz |tail -n +2| sort -t',' -k1,1) <(tail -n +2 ${DATA_PATH}/bc_patients.csv| sort -t',' -k1,1))> ${DATA_PATH}/bc_admissions_patients.csv 2>>script2_error.log
 
+
+
+
 # Get a sample from the bc_admissions_patients.csv
 # requires shuf, may require homebrew for MacOS/Unix download first
 # Fulfills Part of Section B
@@ -89,6 +92,14 @@ tail -n +2 ${DATA_PATH}/bc_patients.csv| cut -d',' -f2| sort | uniq -c |sort -nr
 #ideally no duplicates. So extract out subject_id and race, sort, uniq, cut subject_id, sort, uniq c, sort -nr.
 tail -n +2 ${DATA_PATH}/bc_admissions_patients.csv| cut -d',' -f1,13| sort | uniq| cut -d',' -f2| sort | uniq -c| sort -nr > ${OUT_PATH}/freq_race.txt
 
+# Deriving Skinny Tables 
+# subject_id/race : using bc_admissions_patients.csv
+tail -n +2 ${DATA_PATH}/bc_admissions_patients.csv | cut -d',' -f1,13 | sort -u > ${OUT_PATH}/bc_skinny_subjectID_race.csv 
+
+# subject_id/gender : using bc_patients.csv
+tail -n +2 ${DATA_PATH}/bc_patients.csv | cut -d',' -f1,2 | sort -u > ${OUT_PATH}/bc_skinny_subjectID_gender.csv
+
+
 # language: using bc_admissions.patients.csv
 # as before, extract out subject_id and language, sort, uniq, cut subject_id, sort, uniq c, sort -nr
 tail -n +2 ${DATA_PATH}/bc_admissions_patients.csv| cut -d',' -f1,11| sort | uniq| cut -d',' -f2| sort | uniq -c| sort -nr > ${OUT_PATH}/freq_language.txt
@@ -96,3 +107,6 @@ tail -n +2 ${DATA_PATH}/bc_admissions_patients.csv| cut -d',' -f1,11| sort | uni
 
 # top 10 subjects by number of admissions
 tail -n +2 ${DATA_PATH}/bc_admissions_patients.csv  | cut -d',' -f1  | sort -n  | uniq -c  | sort -nr  | head > ${OUT_PATH}/top_admissions_by_subject.txt
+
+ 
+
