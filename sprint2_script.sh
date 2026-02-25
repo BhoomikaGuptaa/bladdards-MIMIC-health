@@ -10,7 +10,7 @@ OUT_PATH=out
 #creating required directories if not available
 mkdir -p out
 mkdir -p data
-mkdir -p data/samples
+mkdir -p data/sample
 
 # Making an error file with headers to help with debugging script
 # Note that zcat does not work for .gz files on MacOS/Unix systems
@@ -35,7 +35,7 @@ echo "Errors in making bc_icd_codes.csv" > sprint2_error.log
 
 echo "Errors in making bc_diagnoses.csv" >> sprint2_error.log
 
-(echo 'subject_id,hadm_id,seq_num,icd_code,icd_version,long_title' && join -1 1 -2 4 -o 2.1,2.2,2.3,1.1,1.2,1.3 -t $',' <(tail -n +2 $(DATA_PATH}/bc_icd_codes.csv) <(zcat ${HOSP_PATH}/diagnoses_icd.csv.gz| tail -n +2 | sort -t ',' -k4,4)) > ${DATA_PATH}/bc_diagnoses.csv 2>> sprint2_error.log
+(echo 'subject_id,hadm_id,seq_num,icd_code,icd_version,long_title' && join -1 1 -2 4 -o 2.1,2.2,2.3,1.1,1.2,1.3 -t $',' <(tail -n +2 ${DATA_PATH}/bc_icd_codes.csv) <(zcat ${HOSP_PATH}/diagnoses_icd.csv.gz| tail -n +2 | sort -t ',' -k4,4)) > ${DATA_PATH}/bc_diagnoses.csv 2>> sprint2_error.log
 
 # Creating subject_id file
 # cutting the first column, removing header (to add later), then using sort and uniq to remove dupes
