@@ -1,0 +1,18 @@
+   1024 English
+     30 Russian
+     26 Spanish
+     19 Chinese
+      7 Kabuverdianu
+      6 Haitian
+      5 Portuguese
+      5 Korean
+      4 Other
+      4 Modern Greek (1453-)
+      2 Vietnamese
+      2 Persian
+      2 Italian
+      2 Arabic
+      2 
+      1 Somali
+      1 Japanese
+      1 Armenian
