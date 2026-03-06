@@ -4,6 +4,10 @@ set -euo pipefail
 # Sprint 3 (BG): get first bladder cancer diagnosis per patient
 # Goal: one row per subject_id (earliest BC-coded admission)
 #
+#NOTE: This assumes Sprint 2 cohort files exist locally (not committed):
+#   data/bc_diagnoses.csv
+#   data/bc_admissions_patients.csv
+
 # We use awk here because we need to:
 # 1) match codes exactly (not partial string matches)
 # 2) group by subject_id
@@ -13,77 +17,42 @@ set -euo pipefail
 OUT="out/evidence"
 mkdir -p "$OUT"
 
-# ---------------------------------------------------
-# Step 1: Build a simple list of BC ICD codes
-# ---------------------------------------------------
-# bc_icd_codes.csv was generated locally (Sprint 2 logic).
-# We just grab the first column (icd_code), skip header, and deduplicate.
-cut -d',' -f1 data/bc_icd_codes.csv | tail -n +2 | tr -d '\r' | sort -u > "$OUT/bc_codes.txt"
+# # Step 1: Build hadm_id -> admittime lookup from bc_admissions_patients.csv
+# (hadm_id is col 2, admittime is col 3)
+# Both bc_diagnoses and bc_admissions_patients share hadm_id.
+# We pull just those two columns so Step 2 can look up dates.
+cut -d',' -f2,3 data/bc_admissions_patients.csv | tail -n +2 > "$OUT/hadm_to_admittime.csv"
 
-# ---------------------------------------------------
-# Step 2: Filter diagnoses_icd.csv by exact icd_code
-# ---------------------------------------------------
-# We use awk instead of grep because grep can match partial codes
-# (example: code 1881 matching inside 51881).
-# awk lets us check column 4 exactly.
-awk -F',' '
-BEGIN {
-  OFS=",";
-  # Load code list into an array called "codes"
-  # codes["1880"]=1 means that code is valid
-  while ((getline c < "'"$OUT/bc_codes.txt"'") > 0) {
-    codes[c]=1
-  }
-  close("'"$OUT/bc_codes.txt"'")
-}
-NR==1 { print; next }        # keep header
-($4 in codes) { print }      # only keep rows where icd_code matches exactly
-' data/diagnoses_icd.csv > "$OUT/bc_dx_all.csv"
-
-# ---------------------------------------------------
-# Step 3: Build hadm_id -> admittime lookup
-# ---------------------------------------------------
-# admissions.csv columns start:
-# subject_id,hadm_id,admittime,...
-# We only need hadm_id and admittime.
-awk -F',' 'NR>1 {print $2","$3}' data/admissions.csv > "$OUT/hadm_to_admittime.csv"
-
-# ---------------------------------------------------
-# Step 4: Keep earliest BC admission per subject
-# ---------------------------------------------------
-# This is where awk is really useful.
-# We need to:
-# - attach admittime to each BC diagnosis
-# - group by subject_id
-# - keep the smallest (earliest) time
+# Step 2: Find the earliest BC admission per patient
 #
-# Doing this with sort/uniq alone is not enough because we need to compare times.
+# bc_diagnoses.csv has multiple rows per patient (one per BC-coded visit).
+# We need to compare admittimes across rows for the same subject_id
+# and keep only the earliest one. sort/uniq can't do this because the
+# rows are all different lines - we need to track the minimum date per
+# subject across rows, which is what awk's array does here.
 awk -F',' '
 BEGIN { OFS="," }
 
-# First file: hadm_to_admittime.csv
-# Store admittime by hadm_id
+# FILE 1: load hadm_id -> admittime into array t
 NR==FNR {
-  t[$1]=$2
+  t[$1] = $2
   next
 }
 
-# Second file: bc_dx_all.csv
-NR==1 { next }   # skip header
+# FILE 2: bc_diagnoses.csv - find earliest admittime per subject
+NR==1 { next }  # skip header
 
 {
-  sid=$1
-  hadm=$2
-  code=$4
-  time=t[hadm]
+  sid  = $1
+  hadm = $2
+  code = $4
+  time = t[hadm]
 
-  if (time=="") next
+  if (time == "") next
 
-  # If this subject not seen before, or this time is earlier,
-  # update the saved "best" record
   if (!(sid in best_time) || time < best_time[sid]) {
-    best_time[sid]=time
-    best_row[sid]=sid OFS hadm OFS time OFS code
+    best_time[sid] = time
+    best_row[sid]  = sid OFS hadm OFS time OFS code
   }
 }
 
@@ -91,10 +60,21 @@ END {
   print "subject_id,hadm_id,admittime,icd_code"
   for (k in best_row) print best_row[k]
 }
-' "$OUT/hadm_to_admittime.csv" "$OUT/bc_dx_all.csv" \
+' "$OUT/hadm_to_admittime.csv" data/bc_diagnoses.csv \
 | sort -t',' -k1,1n > "$OUT/bc_first_diagnosis.csv"
 
-echo "done"
-echo "codes: $(wc -l < $OUT/bc_codes.txt)"
-echo "bc rows: $(wc -l < $OUT/bc_dx_all.csv)"
-echo "unique subjects: $(( $(wc -l < $OUT/bc_first_diagnosis.csv) - 1 ))"
+# DoD check: verify no duplicate subject_ids
+TOTAL=$(( $(wc -l < $OUT/bc_first_diagnosis.txt) - 1 ))
+UNIQUE=$(tail -n +2 $OUT/bc_first_diagnosis.txt | cut -d',' -f1 | sort -u | wc -l)
+
+echo "total rows: $TOTAL"
+echo "unique subject_ids: $UNIQUE"
+
+if [[ "$TOTAL" -eq "$UNIQUE" ]]; then
+  echo "CHECK PASSED: no duplicate subject_ids"
+else
+  echo "WARNING: duplicates found" >&2
+fi
+
+
+
