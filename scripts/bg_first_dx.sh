@@ -15,13 +15,14 @@ set -euo pipefail
 # That kind of “group and compare” logic is hard to do with just sort/uniq.
 
 OUT="out/evidence"
+DATA="data"
 mkdir -p "$OUT"
 
 # # Step 1: Build hadm_id -> admittime lookup from bc_admissions_patients.csv
 # (hadm_id is col 2, admittime is col 3)
 # Both bc_diagnoses and bc_admissions_patients share hadm_id.
 # We pull just those two columns so Step 2 can look up dates.
-cut -d',' -f2,3 data/bc_admissions_patients.csv | tail -n +2 > "$OUT/hadm_to_admittime.csv"
+cut -d',' -f2,3 "$DATA/bc_admissions_patients.csv" | tail -n +2 > "$OUT/hadm_to_admittime.csv"
 
 # Step 2: Find the earliest BC admission per patient
 #
@@ -60,7 +61,7 @@ END {
   print "subject_id,hadm_id,admittime,icd_code"
   for (k in best_row) print best_row[k]
 }
-' "$OUT/hadm_to_admittime.csv" data/bc_diagnoses.csv \
+' "$OUT/hadm_to_admittime.csv" "$DATA/bc_diagnoses.csv" \
 | sort -t',' -k1,1n > "$OUT/bc_first_diagnosis.csv"
 
 # DoD check: verify no duplicate subject_ids
