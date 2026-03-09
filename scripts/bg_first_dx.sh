@@ -46,6 +46,7 @@ NR==1 { next }  # skip header
 {
   sid  = $1
   hadm = $2
+seq  = $3
   code = $4
   time = t[hadm]
 
@@ -53,20 +54,20 @@ NR==1 { next }  # skip header
 
   if (!(sid in best_time) || time < best_time[sid]) {
     best_time[sid] = time
-    best_row[sid]  = sid OFS hadm OFS time OFS code
+    best_row[sid]  = sid OFS hadm OFS time OFS seq OFS code
   }
 }
 
 END {
-  print "subject_id,hadm_id,admittime,icd_code"
+  print "subject_id,hadm_id,admittime,seq_num,icd_code"
   for (k in best_row) print best_row[k]
 }
 ' "$OUT/hadm_to_admittime.csv" "$DATA/bc_diagnoses.csv" \
 | sort -t',' -k1,1n > "$OUT/bc_first_diagnosis.csv"
 
 # DoD check: verify no duplicate subject_ids
-TOTAL=$(( $(wc -l < $OUT/bc_first_diagnosis.txt) - 1 ))
-UNIQUE=$(tail -n +2 $OUT/bc_first_diagnosis.txt | cut -d',' -f1 | sort -u | wc -l)
+TOTAL=$(( $(wc -l < $OUT/bc_first_diagnosis.csv) - 1 ))
+UNIQUE=$(tail -n +2 $OUT/bc_first_diagnosis.csv | cut -d',' -f1 | sort -u | wc -l)
 
 echo "total rows: $TOTAL"
 echo "unique subject_ids: $UNIQUE"
