@@ -78,5 +78,24 @@ else
   echo "WARNING: duplicates found" >&2
 fi
 
+# ---------------------------------------------------
+# Trust check: missingness for admittime (key field)
+# ---------------------------------------------------
+# We depend on admittime to pick the earliest admission per patient.
+# So we count how many rows have admittime missing/blank.
+TOTAL_ROWS=$(( $(wc -l < data/bc_admissions_patients.csv) - 1 ))
 
+MISSING_ADMITTIME=$(
+  awk -F',' 'NR>1 { gsub(/\r/,"",$3); if ($3=="" || $3=="NA" || $3=="NULL" || $3=="null") c++ }
+  END { print c+0 }' data/bc_admissions_patients.csv
+)
+
+{
+  echo "trust_check_field=admittime"
+  echo "source=data/bc_admissions_patients.csv (col3)"
+  echo "total_rows=$TOTAL_ROWS"
+  echo "missing_or_empty_admittime=$MISSING_ADMITTIME"
+} > "$OUT/trust_check.txt"
+
+echo "Wrote: $OUT/trust_check.txt"
 
