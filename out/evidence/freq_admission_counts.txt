@@ -1,0 +1,4 @@
+Admissions	Subjects
+Two	51
+Three+	37
+One	167

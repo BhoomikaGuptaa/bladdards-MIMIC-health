@@ -2,8 +2,8 @@
 
 #  sprint3_script.sh
 #  
-#
-#  Conglomerated by Sharon M.
+# Created by Bhoomika, Aaditya and Sharon
+# Combined by Sharon M.
 #
 set -euo pipefail
 
@@ -267,7 +267,7 @@ awk -F '\t' \
 FNR==1 {next}\
 {admissions = $2\
 ($2>=3 ? bucket3++ : ($2==2 ? bucket2++ : bucket1++))}\
-END {print "One""\t"bucket1"\nTwo""\t"bucket2"\nThree+""\t"bucket3}' ${OUT}/admission_counts_pre_bc.txt| sort -t '\t' -k2,2 -nr)>${OUT}/frequency_admission_counts.txt
+END {print "One""\t"bucket1"\nTwo""\t"bucket2"\nThree+""\t"bucket3}' ${OUT}/admission_counts_pre_bc.txt| sort -t '\t' -k2,2 -nr)>${OUT}/freq_admission_counts.txt
 
 
 # make a top 20 list of those ICD codes and conditions.
@@ -305,5 +305,5 @@ FNR==1 {next}\
 {admin_type = $1 ; subjects = $2; \
 ($1=="One" ? (admin_count += subjects) : ($1=="Two" ? (admin_count+= subjects*2): (admin_count += subjects*3)))}\
 END {print admin_count }' \
-${OUT}/frequency_admission_counts.txt)>>${OUT}/admission_outliers.txt
+${OUT}/freq_admission_counts.txt)>>${OUT}/admission_outliers.txt
 
