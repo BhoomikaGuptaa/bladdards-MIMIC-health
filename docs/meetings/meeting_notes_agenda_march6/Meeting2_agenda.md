@@ -11,9 +11,11 @@ Review evidence artifacts, agree on a recommendation, and finalize the Decision 
 1) Status check (5 min)
 - What artifacts are complete?
     - in progress 
+    - preliminary admission counts, ICD frequency, and outlier files generated
   
 - What is blocked?
     - can't run scripts yet - path issues
+        - resolved 
 
 2) Evidence walkthrough (20 to 25 min)
 For each artifact:
