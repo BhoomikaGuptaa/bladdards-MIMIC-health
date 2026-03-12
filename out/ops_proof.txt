@@ -1,0 +1,28 @@
+# Ops proof for Sprint 3
+# Paste the commands you ran and the outputs for monitoring.
+
+# 1) Run the script in the background
+scripts/run_sprint3.sh&
+
+
+# 2) Record the job id and PID shown by your shell, then capture monitoring output
+jobs
+Job ID is [1], PID is 33611 (this time)
+
+# Replace <PID> with the actual process id
+ps -p <PID> -o pid,etime,cmd
+(only had enough time to do ps and grab it before script finished)
+
+33611 ttys000    0:00.01 /bin/bash scripts/run_sprint3.sh
+
+# 3) Show that logs are being written
+tail -n 20 out/run_sprint3.log
+done
+codes:       26
+bc rows:     2034
+unique subjects: 1143
+Created: out/evidence/pre_bc_symptom_timeline.csv
+timeline rows: 1690
+subjects in timeline:     1143
+symptom rows: 547
+BC rows: 1143

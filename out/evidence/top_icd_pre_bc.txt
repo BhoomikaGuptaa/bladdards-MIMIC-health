@@ -1,0 +1,20 @@
+108	5990	9	"Urinary tract infection, site not specified"
+87	N390	10	"Urinary tract infection, site not specified"
+52	78820	9	"Retention of urine, unspecified"
+41	R319	10	"Hematuria, unspecified"
+28	R338	10	Other retention of urine
+28	59970	9	"Hematuria, unspecified"
+26	R310	10	Gross hematuria
+25	R339	10	"Retention of urine, unspecified"
+25	59971	9	Gross hematuria
+19	N329	10	"Bladder disorder, unspecified"
+9	R109	10	Unspecified abdominal pain
+9	78900	9	"Abdominal pain, unspecified site"
+8	5941	9	Other calculus in bladder
+7	R300	10	Dysuria
+6	5997	9	Hematuria
+5	5920	9	Calculus of kidney
+4	R3129	10	Other microscopic hematuria
+4	R1032	10	Left lower quadrant pain
+4	N210	10	Calculus in bladder
+3	R1030	10	"Lower abdominal pain, unspecified"
