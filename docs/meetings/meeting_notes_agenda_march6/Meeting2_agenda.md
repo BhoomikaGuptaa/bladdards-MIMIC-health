@@ -5,16 +5,15 @@ Duration: 45 to 60 minutes
 Facilitator (PM): Kristy Chan
 Notetaker: Ara Anandkumar
 
-Goal of the meeting: check in on 
-Review evidence artifacts, agree on a recommendation, and finalize the Decision Brief and Action Plan.
+Goal of the meeting: check in on progress,
+review evidence artifacts, agree on a recommendation, and finalize the Decision Brief and Action Plan.
 
 1) Status check (5 min)
 - What artifacts are complete?
-    - in progress 
+    - preliminary admission counts, ICD frequency, and outlier files generated
   
 - What is blocked?
-    - can't run scripts yet - path issues
-
+    - initial script errors resolved; only minor clean‑up remains
 2) Evidence walkthrough (20 to 25 min)
 For each artifact:
 - What does it show (one sentence)?
@@ -25,11 +24,11 @@ For each artifact:
     - the time is inconsistent
 
 Artifacts:
-- A1: out/evidence/<...>
-- A2: out/evidence/<...>
-- A3: out/evidence/<...>
-- Trust check: out/evidence/<...>
-- Assumption test: out/evidence/<...>
+- A1: out/evidence/admission_counts_pre_bc.txt (counts of prior admissions before first bladder cancer diagnosis)
+- A2: out/evidence/freq_admission_counts.txt (frequency distribution of admission counts)
+- A3: out/evidence/top_icd_pre_bc.txt (most common ICD codes prior to diagnosis)
+- Trust check: out/evidence/admission_outliers.txt (check for extreme values and missing data)
+- Assumption test: review of symptom keyword filters in scripts
 
 3) Recommendation drafting (10 to 15 min)
 Draft 1 to 3 recommendation bullets and verify they are supported by evidence.
