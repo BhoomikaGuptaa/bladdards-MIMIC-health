@@ -27,11 +27,15 @@ For each artifact:
     - the time (year) is inconsistent
 
 Artifacts:
-- A1: out/evidence/admission_counts_pre_bc.txt (counts of prior admissions before first bladder cancer diagnosis)
-- A2: out/evidence/freq_admission_counts.txt (frequency distribution of admission counts)
-- A3: out/evidence/top_icd_pre_bc.txt (most common ICD codes prior to diagnosis)
-- Trust check: out/evidence/admission_outliers.txt (check for extreme values and missing data)
-- Assumption test: review of symptom keyword filters in scripts
+- A1: out/evidence/bc_first_diagnosis.txt (first bladder cancer diagnosis per patient)
+- A2: out/evidence/symptom_icd_list.txt (list of symptom-related ICD codes)
+- A3: out/evidence/pre_bc_symptom_admissions.txt (admissions with symptom codes before BC diagnosis)
+- A4: out/evidence/pre_bc_symptom_admissions_joined.txt (joined view of pre-BC symptom admissions)
+- A5: out/evidence/admissions_counts_pre_bc.txt (counts of prior admissions before first bladder cancer diagnosis)
+- A6: out/evidence/admissions_outliers.txt (patients with unusually high admission counts)
+- A7: out/evidence/freq_admissions_counts.txt (frequency distribution of admission counts)
+- Trust check: out/evidence/trust_check.txt (check for extreme values and missing data)
+- Assumption test: deliverables/assumption_filter_check.csv
 
 3) Recommendation drafting (10 to 15 min)
 Draft 1 to 3 recommendation bullets and verify they are supported by evidence.
