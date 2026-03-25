@@ -307,3 +307,10 @@ FNR==1 {next}\
 END {print admin_count }' \
 ${OUT}/freq_admission_counts.txt)>>${OUT}/admission_outliers.txt
 
+# ---------------------------------------------------
+# Step CSV: clean and normalize output CSVs -> TSVs
+# ---------------------------------------------------
+# Runs the sed -E cleaning pipeline on key sprint output CSVs,
+# producing TSV files and a before/after sample for validation.
+bash "$(dirname "$0")/csv_to_tsv.sh"
+
