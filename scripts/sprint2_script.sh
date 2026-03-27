@@ -4,13 +4,14 @@
 HOSP_PATH=data/MIMIC-IV/hosp
 DATA_PATH=data
 OUT_PATH=out
-
+LOG_FILE=out/logs/sprint2_error.log
 # using bc as a shorthand for bladder cancer
 
 #creating required directories if not available
 mkdir -p out
 mkdir -p data
 mkdir -p data/sample
+mkdir -p out/logs
 
 # Making an error file with headers to help with debugging script
 # Note that zcat does not work for .gz files on MacOS/Unix systems
@@ -23,9 +24,8 @@ mkdir -p data/sample
 # presorting for ease of joins later
 # Fulfills case-insensitive and inverse grep matching requirements in Part C
 
-echo "Errors in making bc_icd_codes.csv" > sprint2_error.log
-
-(zcat ${HOSP_PATH}/d_icd_diagnoses.csv.gz| head -n1 && zgrep -wi 'bladder' ${HOSP_PATH}/d_icd_diagnoses.csv.gz| zgrep -wi 'neoplasm' | zgrep -wiv 'history'| sort -n -k1,1 -t $',') > ${DATA_PATH}/bc_icd_codes.csv 2>>sprint2_error.log
+echo "Errors in making bc_icd_codes.csv" > ${LOG_FILE}
+(gunzip -c ${HOSP_PATH}/d_icd_diagnoses.csv.gz| head -n1 && zgrep -wi 'bladder' ${HOSP_PATH}/d_icd_diagnoses.csv.gz| zgrep -wi 'neoplasm' | zgrep -wiv 'history'| sort -n -k1,1 -t $',') > ${DATA_PATH}/bc_icd_codes.csv 2>> ${LOG_FILE}
 
 
 # Using the ICD codes saved to scan diagnoses for related subjects
@@ -33,30 +33,30 @@ echo "Errors in making bc_icd_codes.csv" > sprint2_error.log
 # saving the values in a file bc_diagnoses.csv with header
 # containing subject_id, hadm_id, seq_num, icd_code, icd_version, long_title
 
-echo "Errors in making bc_diagnoses.csv" >> sprint2_error.log
+echo "Errors in making bc_diagnoses.csv" >> ${LOG_FILE}
 
 (
   echo 'subject_id,hadm_id,seq_num,icd_code,icd_version,long_title'
   join -t',' -1 1 -2 4 -o 2.1,2.2,2.3,1.1,1.2,1.3 \
     <(tail -n +2 data/bc_icd_codes.csv | sort -t',' -k1,1) \
-    <(zcat data/MIMIC-IV/hosp/diagnoses_icd.csv.gz | tail -n +2 | sort -t',' -k4,4)
-) > data/bc_diagnoses.csv 2>> sprint2_error.log
+    <(gunzip -c data/MIMIC-IV/hosp/diagnoses_icd.csv.gz | tail -n +2 | sort -t',' -k4,4)
+) > data/bc_diagnoses.csv 2>> ${LOG_FILE}
 # Creating subject_id file
 # cutting the first column, removing header (to add later), then using sort and uniq to remove dupes
 # saving output as bc_subjects.csv
 # Is technically a skinny table
 
-echo 'Errors in bc_subjects.csv' >> sprint2_error.log
+echo 'Errors in bc_subjects.csv' >> ${LOG_FILE}
 
-(echo 'subject_id' && cut -f1 -d',' ${DATA_PATH}/bc_diagnoses.csv| tail -n +2| sort | uniq| sort -n) > ${DATA_PATH}/bc_subjects.csv 2>> sprint2_error.log
+(echo 'subject_id' && cut -f1 -d',' ${DATA_PATH}/bc_diagnoses.csv| tail -n +2| sort | uniq| sort -n) > ${DATA_PATH}/bc_subjects.csv 2>> ${LOG_FILE}
 
 # Use the subject file to pull out more patient information to save
 # pulling patient file from hosp/patients.csv.gz
 # use join and save in data using bc_patients.csv
 # contains subject_id, gender, anchor age, anchor year, anchor year group, date of death
-echo "Error in pulling out bc_patients.csv" >> sprint2_error.log
+echo "Error in pulling out bc_patients.csv" >> ${LOG_FILE}
 
-(echo 'subject_id,gender,anchor_age,anchor_year,anchor_year_group,dod' && join -t $',' <(tail -n +2 ${DATA_PATH}/bc_subjects.csv) <(zcat ${HOSP_PATH}/patients.csv.gz| tail -n +2 | sort -t $',' -k1,1 -n)) > ${DATA_PATH}/bc_patients.csv 2>> sprint2_error.log
+(echo 'subject_id,gender,anchor_age,anchor_year,anchor_year_group,dod' && join -t $',' <(tail -n +2 ${DATA_PATH}/bc_subjects.csv) <(gunzip -c ${HOSP_PATH}/patients.csv.gz| tail -n +2 | sort -t $',' -k1,1 -n)) > ${DATA_PATH}/bc_patients.csv 2>> ${LOG_FILE}
 
 # Get all diagnoses from subjects of concern
 # combines bc_subjects and diagnoses_icd tables
@@ -64,9 +64,9 @@ echo "Error in pulling out bc_patients.csv" >> sprint2_error.log
 # joins subject to diagnosis table
 # contains subject_id, hadm_id, seq_num, icd_code, icd_version
 # cannot at this time link to long version due to the lack of sanitation (comma’s present in the long_title field messing with the join)
-echo "Error in pulling out bc_subjects_diagnoses.csv" >> sprint2_error.log
+echo "Error in pulling out bc_subjects_diagnoses.csv" >> ${LOG_FILE}
 
-(echo 'subject_id,hadm_id,seq_num,icd_code,icd_version' && join -1 1 -2 1 -t',' <(tail -n +2 ${DATA_PATH}/bc_subjects.csv ) <(zcat ${HOSP_PATH}/diagnoses_icd.csv.gz| tail -n +2 | sort -t',' -k1,1 -n))> ${DATA_PATH}/bc_subjects_diagnoses.csv 2>> sprint2_error.log
+(echo 'subject_id,hadm_id,seq_num,icd_code,icd_version' && join -1 1 -2 1 -t',' <(tail -n +2 ${DATA_PATH}/bc_subjects.csv ) <(gunzip -c ${HOSP_PATH}/diagnoses_icd.csv.gz| tail -n +2 | sort -t',' -k1,1 -n))> ${DATA_PATH}/bc_subjects_diagnoses.csv 2>> ${LOG_FILE}
 
 
 # Get all visits from subjects and combine with patient information)
@@ -76,7 +76,7 @@ echo "Error in pulling out bc_subjects_diagnoses.csv" >> sprint2_error.log
 # Fulfills part of section C optional join
 echo "Error in pulling all admissions of patients with their information" >> sprint2_error.log
 
-(echo 'subject_id,hadm_id,admittime,dischtime,deathtime,admission_type,admit_provider_id,admission_location,discharge_location,insurance,language,marital_status,race,edregtime,edoutttime,hospital_expire_flag,gender,anchor_age,anchor_year,anchor_year_group,dod' && join -1 1 -2 1 -t',' <(zcat ${HOSP_PATH}/admissions.csv.gz |tail -n +2| sort -t',' -k1,1) <(tail -n +2 ${DATA_PATH}/bc_patients.csv| sort -t',' -k1,1))> ${DATA_PATH}/bc_admissions_patients.csv 2>>script2_error.log
+(echo 'subject_id,hadm_id,admittime,dischtime,deathtime,admission_type,admit_provider_id,admission_location,discharge_location,insurance,language,marital_status,race,edregtime,edoutttime,hospital_expire_flag,gender,anchor_age,anchor_year,anchor_year_group,dod' && join -1 1 -2 1 -t',' <(gunzip -c ${HOSP_PATH}/admissions.csv.gz |tail -n +2| sort -t',' -k1,1) <(tail -n +2 ${DATA_PATH}/bc_patients.csv| sort -t',' -k1,1))> ${DATA_PATH}/bc_admissions_patients.csv 2>>script2_error.log
 
 
 
@@ -84,9 +84,9 @@ echo "Error in pulling all admissions of patients with their information" >> spr
 # Get a sample from the bc_admissions_patients.csv
 # requires shuf, may require homebrew for MacOS/Unix download first
 # Fulfills Part of Section B
-echo "Errors in getting a shuffled subset of bc_admissions_patients.csv" >> script2_error.log
+echo "Errors in getting a shuffled subset of bc_admissions_patients.csv" >> ${LOG_FILE}
 
-(head -n1 ${DATA_PATH}/bc_admissions_patients.csv && tail -n +2 ${DATA_PATH}/bc_admissions_patients.csv| shuf -n 1000) > ${DATA_PATH}/sample/subset_bc_admissions_patients.csv 2>>script2_error.log
+(head -n1 ${DATA_PATH}/bc_admissions_patients.csv && tail -n +2 ${DATA_PATH}/bc_admissions_patients.csv| shuf -n 1000) > ${DATA_PATH}/sample/subset_bc_admissions_patients.csv 2>> ${LOG_FILE}
 
 # Get histograms
 # sex/gender : using bc_patients.csv
