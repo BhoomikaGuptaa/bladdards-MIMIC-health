@@ -7,14 +7,17 @@
 #
 set -euo pipefail
 
-LOG=out/run_sprint3.log
-ERROR=out/errors.log
+LOG=out/logs/run_sprint3.log
+ERROR=out/logs/run_sprint3_errors.log
 OUT=out/evidence
 DATA=data
 MIMIC=data/MIMIC-IV/hosp
 FULL_DX_GZ="data/MIMIC-IV/hosp/diagnoses_icd.csv.gz"
+
 #where the diagnoses file lives
+
 DICT="data/MIMIC-IV/hosp/d_icd_diagnoses.csv.gz"
+
 # where the icd codes lives
 
 # Sprint 3 (BG): get first bladder cancer diagnosis per patient
@@ -56,7 +59,7 @@ BEGIN {
 }
 NR==1 { print; next }        # keep header
 ($4 in codes) { print }      # only keep rows where icd_code matches exactly
-' <(gzcat ${MIMIC}/diagnoses_icd.csv.gz) > "${OUT}/bc_dx_all.csv"
+' <(gunzip -c ${MIMIC}/diagnoses_icd.csv.gz) > "${OUT}/bc_dx_all.csv"
 
 ## Use join. In fact, we have this table -> bc_diagnoses.csv
 
@@ -66,7 +69,7 @@ NR==1 { print; next }        # keep header
 # admissions.csv columns start:
 # subject_id,hadm_id,admittime,...
 # We only need hadm_id and admittime.
-awk -F',' 'NR>1 {print $2","$3}' <(gzcat ${MIMIC}/admissions.csv.gz) > "${OUT}/hadm_to_admittime.csv"
+awk -F',' 'NR>1 {print $2","$3}' <(gunzip -c ${MIMIC}/admissions.csv.gz) > "${OUT}/hadm_to_admittime.csv"
 
 # ---------------------------------------------------
 # Step 4: Keep earliest BC admission per subject
@@ -136,7 +139,7 @@ KEYWORDS="hematuria|dysuria|urinary tract infection|uti|abdominal pain|gas pain|
 {
   echo "icd_code,icd_version,long_title"
 
-  gzcat "$DICT" \
+  gunzip -c "$DICT" \
   | awk -F',' 'NR>1 {print $1","$2","$3}' \
   | grep -Eiw "${KEYWORDS}"
 
@@ -168,7 +171,7 @@ KEYWORDS="hematuria|dysuria|urinary tract infection|uti|abdominal pain|gas pain|
       print $1 "," $2 "," $3 "," $4 "," $5
     }
   }
-  ' "${DATA}/symptom_icd_list.txt" <(gzcat "${FULL_DX_GZ}")
+  ' "${DATA}/symptom_icd_list.txt" <(gunzip -c "${FULL_DX_GZ}")
 ) \
 > "${OUT}/symptom_dx_all.csv"
 
@@ -267,7 +270,7 @@ awk -F '\t' \
 FNR==1 {next}\
 {admissions = $2\
 ($2>=3 ? bucket3++ : ($2==2 ? bucket2++ : bucket1++))}\
-END {print "One""\t"bucket1"\nTwo""\t"bucket2"\nThree+""\t"bucket3}' ${OUT}/admission_counts_pre_bc.txt| sort -t '\t' -k2,2 -nr)>${OUT}/freq_admission_counts.txt
+END {print "One""\t"bucket1"\nTwo""\t"bucket2"\nThree+""\t"bucket3}' ${OUT}/admission_counts_pre_bc.txt| sort -t $'\t' -k2,2 -nr)>${OUT}/freq_admission_counts.txt
 
 
 # make a top 20 list of those ICD codes and conditions.
@@ -282,7 +285,7 @@ head -n20| sed -E 's/^[[:space:]]*([0-9]+)[[:space:]]+(.+)/\1\t\2/'|\
 # grabs the head and changes to tab delimited. Now to join with ICD version and long title as tabs
 sort -t $'\t' -k2,2| \
 #sorting them by icd code
-join -1 2 -2 1 -t $'\t' -o 1.1,1.2,2.2,2.3 - <(gzcat ${MIMIC}/d_icd_diagnoses.csv.gz| tail -n +2| sed -e 's/,/\t/1' -e 's/,/\t/1'| sort -t $'\t' -k1,1)|\
+join -1 2 -2 1 -t $'\t' -o 1.1,1.2,2.2,2.3 - <(gunzip -c ${MIMIC}/d_icd_diagnoses.csv.gz| tail -n +2| sed -e 's/,/\t/1' -e 's/,/\t/1'| sort -t $'\t' -k1,1)|\
 sort -t $'\t' -k1,1 -nr > ${OUT}/top_icd_pre_bc.txt
 
 
@@ -306,11 +309,4 @@ FNR==1 {next}\
 ($1=="One" ? (admin_count += subjects) : ($1=="Two" ? (admin_count+= subjects*2): (admin_count += subjects*3)))}\
 END {print admin_count }' \
 ${OUT}/freq_admission_counts.txt)>>${OUT}/admission_outliers.txt
-
-# ---------------------------------------------------
-# Step CSV: clean and normalize output CSVs -> TSVs
-# ---------------------------------------------------
-# Runs the sed -E cleaning pipeline on key sprint output CSVs,
-# producing TSV files and a before/after sample for validation.
-bash "$(dirname "$0")/csv_to_tsv.sh"
 
