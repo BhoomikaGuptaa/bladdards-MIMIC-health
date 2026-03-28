@@ -1,7 +1,9 @@
 #!/bin/bash
 #
+# run_pa4.sh
 # Sprint 4 main script. Builds off sprint 3 outputs.
 #
+
 set -euo pipefail
 
 mkdir -p out/evidence logs
@@ -66,7 +68,7 @@ sed -E \
 # 
 # BEFORE/AFTER sample file
 # 
-# Writes head -n 5 of each CSV and TSV into one file 
+# Writes head -n 5 of each CSV (before) and TSV (after) into one file for review
 {
   echo "BEFORE: bc_first_diagnosis.csv (head -n 5)"
   head -n 5 "${OUT}/bc_first_diagnosis.csv"
