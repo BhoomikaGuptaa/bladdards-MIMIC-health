@@ -6,7 +6,15 @@
 
 set -euo pipefail
 
+LOG=logs/run_pa4.log
+ERROR=logs/errors_pa4.log
+
 mkdir -p out/evidence logs
+
+# Clear/create log files before each run so logs don't accumulate across runs
+: > "${LOG}"
+: > "${ERROR}"
+exec > >(tee -a "${LOG}") 2> >(tee -a "${ERROR}" >&2)
 
 # Prompt for the path to the sprint 3 output CSVs.
 # The MIMIC-IV dataset location varies per machine, so this allows the
@@ -21,6 +29,21 @@ fi
 
 # OUT is used as the base directory for both input CSVs and output TSVs
 OUT="$INPUT_PATH"
+
+# Check that the path actually exists
+if [ ! -d "$OUT" ]; then
+  echo "Error: path does not exist: $OUT"
+  exit 1
+fi
+
+# Check that all required sprint 3 output files are present.
+# If any are missing, exit with a clear error instead of failing silently later.
+for f in bc_first_diagnosis.csv pre_bc_symptom_timeline.csv admission_counts_pre_bc.txt; do
+  if [ ! -f "${OUT}/${f}" ]; then
+    echo "Error: required file not found: ${OUT}/${f}"
+    exit 1
+  fi
+done
 
 # Clean bc_first_diagnosis.csv -> bc_first_diagnosis.tsv
 # source cols: subject_id,hadm_id,admittime,icd_code
