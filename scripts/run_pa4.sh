@@ -1,17 +1,30 @@
 #!/bin/bash
-
-# run_pa4.sh
 #
 # Sprint 4 main script. Builds off sprint 3 outputs.
 #
 set -euo pipefail
 
-OUT=out/evidence
+mkdir -p out/evidence logs
+
+# Prompt for the path to the sprint 3 output CSVs.
+# The MIMIC-IV dataset location varies per machine, so this allows the
+# TA/grader to point the script at wherever their sprint 3 outputs live.
+# Press Enter to accept the default (out/evidence).
+echo "Enter path to sprint 3 output CSVs [default: out/evidence]:"
+read INPUT_PATH
+# If the user pressed Enter without typing a path, fall back to the default
+if [ -z "$INPUT_PATH" ]; then
+  INPUT_PATH=out/evidence
+fi
+
+# OUT is used as the base directory for both input CSVs and output TSVs
+OUT="$INPUT_PATH"
 
 # Clean bc_first_diagnosis.csv -> bc_first_diagnosis.tsv
 # source cols: subject_id,hadm_id,admittime,icd_code
 # strip quotes, remove brackets, remove thousands separators,
 # convert comma delimiter to tab, trim leading/trailing whitespace,
+
 # then fill empty fields with NA.
 # after converting commas to tabs, an empty field looks like \t\t (two tabs in a row).
 # s/\t\t/\tNA\t/ replaces it with NA in the middle.
@@ -53,7 +66,7 @@ sed -E \
 # 
 # BEFORE/AFTER sample file
 # 
-# Writes head -n 5 of each CSV (before) and TSV (after) into one file for review
+# Writes head -n 5 of each CSV and TSV into one file 
 {
   echo "BEFORE: bc_first_diagnosis.csv (head -n 5)"
   head -n 5 "${OUT}/bc_first_diagnosis.csv"
