@@ -77,3 +77,183 @@ wc -l "${OUT}/bc_first_diagnosis.csv" "${OUT}/bc_first_diagnosis.tsv"
 
 echo "pre_bc_symptom_timeline row count:"
 wc -l "${OUT}/pre_bc_symptom_timeline.csv" "${OUT}/pre_bc_symptom_timeline.tsv"
+
+
+
+
+#Task 3
+# Build out/buckets.tsv
+
+awk '
+BEGIN {
+  OFS="\t"
+}
+
+# first file: count total visits per subject_id
+NR==FNR {
+  if (FNR==1) next
+  n = split($0, a, ",")
+  sid = a[1]
+  total[sid]++
+  ids[sid] = 1
+  next
+}
+
+# skip header of second file
+FNR==1 { next }
+
+# second file: get pre_dx_visits per subject_id
+{
+  n = split($0, a, "\t")
+  sid = a[1]
+  cnt = a[2]
+
+  # skip bad rows with missing values
+  if (sid == "" || cnt == "") next
+
+  pre[sid] = cnt
+  ids[sid] = 1
+}
+
+END {
+  # print header
+  print "subject_id","total_visits","pre_dx_visits","pre_dx_ratio","bucket"
+
+  for (sid in ids) {
+    tv = (sid in total ? total[sid] : 0)
+    pv = (sid in pre ? pre[sid] : 0)
+
+    # avoid divide by 0
+    if (tv == 0) {
+      ratio = "NA"
+    } else {
+      ratio = sprintf("%.3f", pv / tv)
+    }
+
+    # assign bucket based on pre_dx_visits
+    if (pv == 0) {
+      bucket = "ZERO"
+    } else if (pv == 1) {
+      bucket = "LOW"
+    } else if (pv == 2) {
+      bucket = "MID"
+    } else {
+      bucket = "HIGH"
+    }
+
+    print sid, tv, pv, ratio, bucket
+  }
+}
+' data/bc_admissions_patients.csv out/evidence/admission_counts_pre_bc.txt \
+| sort -t$'\t' -k1,1n > out/buckets.tsv
+
+echo "buckets written to out/buckets.tsv"
+head -n 5 out/buckets.tsv
+
+
+
+
+# Task 5: Build out/patient_summary.tsv
+
+awk -F'\t' '
+BEGIN { OFS="\t" }
+
+NR==1 { next }
+
+# First pass: compute cohort-level stats from pre_dx_visits
+{
+  pv = $3
+
+  vals[n] = pv
+
+  if (n == 0 || pv < min) min = pv
+  if (n == 0 || pv > max) max = pv
+
+  sum += pv
+  sumsq += pv * pv
+  n++
+}
+
+END {
+  mean = sum / n
+  std = sqrt((sumsq / n) - (mean * mean))
+
+  # sort values for quartiles
+  for (i = 1; i < n; i++) {
+    key = vals[i]
+    j = i - 1
+    while (j >= 0 && vals[j] > key) {
+      vals[j+1] = vals[j]
+      j--
+    }
+    vals[j+1] = key
+  }
+
+  q1 = vals[int((n + 3) / 4)]
+  median = vals[int((n + 1) / 2)]
+  q3 = vals[int((3 * n + 1) / 4)]
+
+  # save stats for second pass
+  printf "%.6f\t%.6f\t%d\t%d\t%d\t%d\t%d\n", mean, std, min, max, q1, median, q3 > "out/stats.tmp"
+}
+' out/buckets.tsv
+
+awk -F'\t' '
+BEGIN {
+  OFS="\t"
+
+  # read saved cohort-level stats
+  getline line < "out/stats.tmp"
+  split(line, s, "\t")
+
+  mean = s[1]
+  std = s[2]
+  min = s[3]
+  max = s[4]
+  q1 = s[5]
+  median = s[6]
+  q3 = s[7]
+
+  # print header
+  printf "subject_id\ttotal_visits\tpre_dx_visits\tzscore\toutlier\n"
+}
+
+NR==1 { next }
+
+{
+  sid = $1
+  tv = $2
+  pv = $3
+
+  # compute z-score
+  if (std == 0) {
+    z = 0
+  } else {
+    z = (pv - mean) / std
+  }
+
+  # classify outliers
+  if (z >= 3 || z <= -3) {
+    out = "EXTREME"
+  } else if (z >= 2 || z <= -2) {
+    out = "MODERATE"
+  } else {
+    out = "NO"
+  }
+
+  # print one row per patient
+  printf "%s\t%d\t%d\t%.3f\t%s\n", sid, tv, pv, z, out
+}
+
+END {
+  # print cohort-level summary stats at the bottom
+  printf "# mean=%.3f std=%.3f min=%d max=%d\n", mean, std, min, max
+  printf "# q1=%d median=%d q3=%d\n", q1, median, q3
+}
+' out/buckets.tsv > out/patient_summary.tsv
+
+rm -f out/stats.tmp
+
+echo "patient summary written"
+head -n 5 out/patient_summary.tsv
+tail -n 3 out/patient_summary.tsv
