@@ -168,10 +168,10 @@ NR == 1 {
 # match() checks if admittime starts with YYYY
 (match($4, /^[0-9]{4}/) == 0) { next }
 
-($6 == "" || $6 == "NA") { next }
+($5 == "" || $5 == "NA") { next }
 
 # Print valid rows (CSV → TSV conversion)
-{ print $1, $2, $3, $4, $5, $6 }
+{ print $1, $2, $3, $4, $5 }
 ' "${OUT}/pre_bc_symptom_timeline.csv" \
 | sort -t$'\t' -k1,1n -k4,4 \
 > "${OUT}/filtered_sample.tsv"
