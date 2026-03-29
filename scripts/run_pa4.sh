@@ -362,7 +362,7 @@ wc -l "${OUT}/anchoring_years.tsv"
 head -n 5 "${OUT}/anchoring_years.tsv"
 
 echo "=== (Part 2 + Part 4) complete ==="
-NR==1 { next }
+awk -F'\t' 'NR==1 { next }
 
 # First pass: compute cohort-level stats from pre_dx_visits
 {
