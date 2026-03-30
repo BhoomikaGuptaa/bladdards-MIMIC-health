@@ -60,3 +60,33 @@ Johnson, A., Bulgarelli, L., Pollard, T., Gow, B., Moody, B., Horng, S., Celi, L
 [Johnson, A.E.W., Bulgarelli, L., Shen, L. et al. MIMIC-IV, a freely accessible electronic health record dataset. Sci Data 10, 1 (2023). https://doi.org/10.1038/s41597-022-01899-x](https://doi.org/10.1038/s41597-022-01899-x)
 
 Goldberger, A., Amaral, L., Glass, L., Hausdorff, J., Ivanov, P. C., Mark, R., ... & Stanley, H. E. (2000). PhysioBank, PhysioToolkit, and PhysioNet: Components of a new research resource for complex physiologic signals. Circulation [Online]. 101 (23), pp. e215–e220. RRID:SCR_007345.
+
+## Symptom List Sources & Rationale
+
+### Sources Consulted
+
+1. **ICD-10 Data Reference**  
+   https://www.icd10data.com/  
+   Used to match symptom keywords to exact ICD terminology for accurate code filtering.
+
+2. **CDC – Bladder Cancer Information**  
+   https://www.cdc.gov/bladder-cancer/about/index.html  
+   Confirmed common bladder cancer symptoms like hematuria and urinary changes.
+
+3. **Mayo Clinic – Bladder Cancer Symptoms & Causes**  
+   https://www.mayoclinic.org/diseases-conditions/bladder-cancer/symptoms-causes/syc-20356104  
+   Helped validate key symptoms and related urinary issues.
+
+4. **Columbia University – Bladder Cancer Overview**  
+   https://www.cancer.columbia.edu/cancer-types-care/types/bladder-cancer/about-bladder-cancer  
+   Cross-checked symptom relevance with clinical descriptions.
+
+### Rationale Behind Symptom List
+
+The symptom list was designed to capture clinically relevant lower abdominal and urinary-related conditions that could plausibly appear before a bladder cancer diagnosis. We prioritized:
+
+- Standard medical terminology (from ICD sources) to ensure compatibility with diagnosis codes  
+- Common pre-diagnostic symptoms (e.g., hematuria, dysuria, urinary retention)  
+- Balanced specificity to avoid losing relevant symptoms, and to avoid capturing irrelevant ones   
+
+This  helps ensure that extracted data is meaningful while minimizing noise in the dataset.
