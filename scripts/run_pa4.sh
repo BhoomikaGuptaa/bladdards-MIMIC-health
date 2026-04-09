@@ -71,7 +71,6 @@ sed -E \
   -e 's/"([^"]*)"/\1/g' \
   -e 's/\[//g' \
   -e 's/\]//g' \
-  -e 's/([0-9]),([0-9]{3})/\1\2/g' \
   -e 's/[[:space:]]*,[[:space:]]*/\t/g' \
   -e 's/^[[:space:]]+//; s/[[:space:]]+$//' \
   "${OUT}/bc_first_diagnosis.csv" \
@@ -90,7 +89,6 @@ sed -E \
   -e 's/"([^"]*)"/\1/g' \
   -e 's/\[//g' \
   -e 's/\]//g' \
-  -e 's/([0-9]),([0-9]{3})/\1\2/g' \
   -e 's/[[:space:]]*,[[:space:]]*/\t/g' \
   -e 's/^[[:space:]]+//; s/[[:space:]]+$//' \
   "${OUT}/pre_bc_symptom_timeline.csv" \
