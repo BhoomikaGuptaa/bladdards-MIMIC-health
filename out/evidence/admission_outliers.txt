@@ -1,6 +1,6 @@
 Sanity Check on Admissions
 Number of unique admissions
-425
+     425
 Number per admission counts
 425
 Approximation based on frequency
