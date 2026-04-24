@@ -1,9 +1,0 @@
-+ echo subject_id,hadm_id,admittime,dischtime,deathtime,admission_type,admit_provider_id,admission_location,discharge_location,insurance,language,marital_status,race,edregtime,edoutttime,hospital_expire_flag,gender,anchor_age,anchor_year,anchor_year_group,dod
-+ join -1 1 -2 1 -t, /dev/fd/63 /dev/fd/62
-++ zcat $'data/MIMIC-IV/hosp\r/admissions.csv.gz'
-++ tail -n +2 $'data\r/bc_patients.csv'
-++ tail -n +2
-++ sort -t, -k1,1
-++ sort -t, -k1,1
-gzip: data/MIMIC-IV/hosp/admissions.csv.gz: No such file or directory
-Errors in getting a shuffled subset of bc_admissions_patients.csv
