@@ -1,41 +1,0 @@
-Errors in making bc_icd_codes.csv
-+ zcat $'data/MIMIC-IV/hosp\r/d_icd_diagnoses.csv.gz'
-+ head -n1
-gzip: data/MIMIC-IV/hosp/d_icd_diagnoses.csv.gz: No such file or directory
-+ zgrep -wi bladder $'data/MIMIC-IV/hosp\r/d_icd_diagnoses.csv.gz'
-+ zgrep -wi neoplasm
-+ zgrep -wiv history
-+ sort -n -k1,1 -t ,
-gzip: data/MIMIC-IV/hosp/d_icd_diagnoses.csv.gz: No such file or directory
-Errors in making bc_diagnoses.csv
-+ echo subject_id,hadm_id,seq_num,icd_code,icd_version,long_title
-++ tail -n +2 $'data\r/bc_icd_codes.csv'
-+ join -1 1 -2 4 -o 2.1,2.2,2.3,1.1,1.2,1.3 -t , /dev/fd/63 /dev/fd/62
-++ zcat $'data/MIMIC-IV/hosp\r/diagnoses_icd.csv.gz'
-++ tail -n +2
-++ sort -t , -k4,4
-gzip: data/MIMIC-IV/hosp/diagnoses_icd.csv.gz: No such file or directory
-Errors in bc_subjects.csv
-+ echo subject_id
-+ cut -f1 -d, $'data\r/bc_diagnoses.csv'
-+ tail -n +2
-+ sort
-+ uniq
-+ sort -n
-Error in pulling out bc_patients.csv
-+ echo subject_id,gender,anchor_age,anchor_year,anchor_year_group,dod
-++ tail -n +2 $'data\r/bc_subjects.csv'
-+ join -t , /dev/fd/63 /dev/fd/62
-++ zcat $'data/MIMIC-IV/hosp\r/patients.csv.gz'
-++ tail -n +2
-++ sort -t , -k1,1 -n
-gzip: data/MIMIC-IV/hosp/patients.csv.gz: No such file or directory
-Error in pulling out bc_subjects_diagnoses.csv
-+ echo subject_id,hadm_id,seq_num,icd_code,icd_version
-++ tail -n +2 $'data\r/bc_subjects.csv'
-+ join -1 1 -2 1 -t, /dev/fd/63 /dev/fd/62
-++ tail -n +2
-++ zcat $'data/MIMIC-IV/hosp\r/diagnoses_icd.csv.gz'
-++ sort -t, -k1,1 -n
-gzip: data/MIMIC-IV/hosp/diagnoses_icd.csv.gz: No such file or directory
-Error in pulling all admissions of patients with their information
