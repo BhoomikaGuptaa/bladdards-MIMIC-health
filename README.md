@@ -1,12 +1,5 @@
 # bladdards-MIMIC-health
 
-## Title: Bladdards (Bladder Bards) 
-### Group Members  
-- Aaditya Deshmukh <aaditya.deshmukh@sjsu.edu>
-- Aradhana Anandkumar <aradhana.anandkumar@sjsu.edu>
-- Kristy Chan <kristychiching.chan@sjsu.edu>
-- Sharon Mathys <sharon.mathys@sjsu.edu> 
-- Bhoomika Gupta <bhoomika.gupta@sjsu.edu>
 
 ## Project Purpose
 Examining instances of Bladder Cancer when present or detected in the ED to see if there are predictable sets of symptoms as current Bladder cancer diagnosis rates are low as many of the initial symptoms overlap with other problems in the gastro-intestinal area such as appendicitis.
